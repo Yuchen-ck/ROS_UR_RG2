@@ -97,7 +97,6 @@ def main():
               end_effector_current_pose.orientation.z,
               end_effector_current_pose.orientation.w)
     
-    service = rospy.Service('pick_object', Trigger, handle_pick_service)
     
 
     # pose_down, attach_gazebo, attach_movit = pick(arm, gripper, scene, scene_pub, cube_pose, cube_size, end_effector_link ,end_effector_current_pose)

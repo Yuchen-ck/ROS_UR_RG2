@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>pick_place_msgs</name>
+  <version>0.0.0</version>
+  <description>The pick_place_msgs package</description>
+
+  <maintainer email="yuchen@todo.todo">yuchen</maintainer>
+  <license>MIT</license>
+
+  <!-- 編譯工具 & catkin 本體 -->
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <!-- 產生訊息/服務程式碼 -->
+  <build_depend>message_generation</build_depend>
+
+  <!-- 自家 message/service 用到的 ROS message types -->
+  <build_depend>std_msgs</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+
+  <!-- 執行時相依 -->
+  <exec_depend>message_runtime</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+
+  <export>
+    <!-- 其他工具註記可以放這裡 -->
+  </export>
+</package>
