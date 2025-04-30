@@ -9,6 +9,8 @@
         "/home/yuchen/rg2_ws/devel/lib/python3/dist-packages",
         "/home/yuchen/ur_ws/devel/lib/python3/dist-packages",
         "/home/yuchen/catkin_ws/devel/lib/python3/dist-packages",
-        "/opt/ros/noetic/lib/python3/dist-packages"
+        "/opt/ros/noetic/lib/python3/dist-packages",
+        "./my_moveit_demo/scripts",
+        "./my_moveit_demo/scripts/pick"
     ]
 }
