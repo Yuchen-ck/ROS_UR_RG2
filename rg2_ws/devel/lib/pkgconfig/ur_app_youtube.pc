@@ -1,0 +1,8 @@
+prefix=/home/test/rg2_ws/devel
+
+Name: ur_app_youtube
+Description: Description of ur_app_youtube
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

@@ -1,0 +1,11 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: ur_app_youtube
+    relative_path: urdf/ur5_yt_gripper.xacro
+    xacro_args: ""
+  SRDF:
+    relative_path: config/ur5_robot.srdf
+  CONFIG:
+    author_name: yuchen
+    author_email: yuchen@gmail.com
+    generated_timestamp: 1744082280

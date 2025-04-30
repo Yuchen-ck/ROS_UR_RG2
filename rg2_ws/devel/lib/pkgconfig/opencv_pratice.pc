@@ -1,0 +1,8 @@
+prefix=/home/test/rg2_ws/devel
+
+Name: opencv_pratice
+Description: Description of opencv_pratice
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

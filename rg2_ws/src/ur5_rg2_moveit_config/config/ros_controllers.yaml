@@ -1,0 +1,68 @@
+controller_list:
+  # ────────────────────────────
+  # 1) UR5 機械臂軌跡控制器
+  # ────────────────────────────
+  - name: /ur5/eff_joint_traj_controller
+    type: FollowJointTrajectory
+    action_ns: follow_joint_trajectory
+
+    allow_start_state_mismatch: true          # 允許首點與真實狀態有偏差
+    start_state_tolerance:                    # （某些版本需要顯式指定）
+      position:     0.10
+      velocity:     0.10
+      acceleration: 0.10
+
+    joints:
+      - shoulder_pan_joint
+      - shoulder_lift_joint
+      - elbow_joint
+      - wrist_1_joint
+      - wrist_2_joint
+      - wrist_3_joint
+
+    goal_time_tolerance: 5.0
+
+    path_tolerance:            # 每個關節都列出，position 放寬到 0.10 rad
+      shoulder_pan_joint:   {position: 0.10, velocity: 0.20, acceleration: 0.20}
+      shoulder_lift_joint:  {position: 0.10, velocity: 0.20, acceleration: 0.20}
+      elbow_joint:          {position: 0.10, velocity: 0.20, acceleration: 0.20}
+      wrist_1_joint:        {position: 0.10, velocity: 0.20, acceleration: 0.20}
+      wrist_2_joint:        {position: 0.10, velocity: 0.20, acceleration: 0.20}
+      wrist_3_joint:        {position: 0.10, velocity: 0.20, acceleration: 0.20}
+
+    goal_tolerance:
+      position:     0.05
+      velocity:     0.05
+      acceleration: 0.05
+
+    gains:   # 只做示範，實際 PID 依需求調整
+      shoulder_pan_joint:  {p: 100.0, i: 0.01, d: 10.0}
+      shoulder_lift_joint: {p: 100.0, i: 0.01, d: 10.0}
+      elbow_joint:        {p: 100.0, i: 0.01, d: 10.0}
+      wrist_1_joint:      {p:  50.0, i: 0.01, d:  5.0}
+      wrist_2_joint:      {p:  50.0, i: 0.01, d:  5.0}
+      wrist_3_joint:      {p:  30.0, i: 0.01, d:  3.0}
+
+  # ────────────────────────────
+  # 2) RG2 夾爪軌跡控制器
+  # ────────────────────────────
+  - name: /ur5/rg2_gripper_controller
+    type: FollowJointTrajectory
+    action_ns: follow_joint_trajectory
+
+    allow_start_state_mismatch: true
+    start_state_tolerance:
+      position:     0.10
+      velocity:     0.10
+      acceleration: 0.10
+
+    joints:
+      - gripper_joint
+
+    goal_time_tolerance: 2.0
+
+    path_tolerance:
+      gripper_joint: {position: 0.10, velocity: 0.20, acceleration: 0.20}
+
+    goal_tolerance:
+      gripper_joint: {position: 0.05, velocity: 0.05, acceleration: 0.05}

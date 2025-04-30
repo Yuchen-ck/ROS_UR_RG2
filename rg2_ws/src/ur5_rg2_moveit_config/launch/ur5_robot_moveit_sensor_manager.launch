@@ -1,0 +1,10 @@
+<launch>
+  <!-- 定義一個參數，用來指定要使用哪種 MoveIt Controller Manager -->
+  <arg name="moveit_controller_manager" default="moveit_simple_controller_manager/MoveItSimpleControllerManager" />
+  
+  <!-- 將 moveit_controller_manager 參數寫入 Parameter Server -->
+  <param name="moveit_controller_manager" value="$(arg moveit_controller_manager)" />
+
+  <!-- 載入 ros_controllers.yaml 內容到參數伺服器中 -->
+  <rosparam file="$(find ur5_rg2_moveit_config)/config/ros_controllers.yaml" command="load" />
+</launch>

@@ -1,0 +1,8 @@
+prefix=/home/test/rg2_ws/devel
+
+Name: my_moveit_demo
+Description: Description of my_moveit_demo
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 
