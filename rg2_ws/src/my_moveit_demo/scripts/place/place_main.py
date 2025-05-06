@@ -1,15 +1,10 @@
 # #!/usr/bin/env python3
 import rospy
-# import sys
-# import moveit_commander
 from std_srvs.srv import Trigger
 from pick_place_msgs.srv import PickStep 
 
-# from gripper import open_gripper, close_gripper, JointState, joint_states_callback
-# from object import add_object_to_scene, set_allowed_collision, get_current_end_effector_pose ,move_to_pose
-# from attach_and_detach import attach_links_gazebo, attach_links_moveit, detach_links_gazebo, detach_links_moveit
-
-# from place.place_function import move_above_table
+from attach_and_detach import  detach_links_gazebo, detach_links_moveit
+from object import set_allowed_collision
 
 def call_gripper_srv(service_name: str) -> bool:
     """
@@ -53,7 +48,7 @@ def place(arm, gripper, scene, scene_pub, pose_start, table_pose, table_size, cu
 
     #[PLACE] Step 1 : move above table 
     # move_above_table(arm, pose_start, table_pose, table_size, cube_size)
-    success, pose_above_object = call_place_step_srv("move_above_table")
+    success, pose_above_table = call_place_step_srv("move_above_table")
     if not success:
         rospy.logerr("移動到物體上方失敗，終止 Pick 流程")
 
@@ -62,14 +57,14 @@ def place(arm, gripper, scene, scene_pub, pose_start, table_pose, table_size, cu
     arm.clear_pose_targets()  # ✅ 正確的方法名稱
     arm.set_start_state_to_current_state()
 
-    if abs(pose_above_object.position.x - table_pose.position.x)< 0.01 and abs(pose_above_object.position.y - (table_pose.position.y + 0.2)) < 0.05:
-        rospy.loginfo("✅ 手臂往下移動，再放爪")
+    # if abs(pose_above_object.position.x - table_pose.position.x)< 0.01 and abs(pose_above_object.position.y - (table_pose.position.y + 0.2)) < 0.05:
+    #     rospy.loginfo("✅ 手臂往下移動，再放爪")
 
-        if call_gripper_srv("gripper/close"):
-            rospy.loginfo("[PICK] 夾爪閉合成功，附著物體")
-        else:
-            rospy.logwarn("[PICK] 閉合失敗")
-            
+    if call_gripper_srv("gripper/open"):
+        rospy.loginfo("[PICK] 夾爪開闔成功，放開物體")
+    else:
+        rospy.logwarn("[PICK] 開闔失敗")
+
     #     pose_down_again = deepcopy(pose_table)
     #     pose_down_again.position.z = table_pose.position.z + cube_size_z / 2 + 0.01
 
@@ -93,16 +88,18 @@ def place(arm, gripper, scene, scene_pub, pose_start, table_pose, table_size, cu
         
     #     rospy.sleep(1.0)
 
-    #     detach_gazebo = detach_links_gazebo("cube_green")
-    #     detach_movit = detach_links_moveit(scene, end_effector_link, "cube_green")
+        detach_gazebo = detach_links_gazebo("cube_green")
+        detach_movit = detach_links_moveit(scene, end_effector_link, "cube_green")
         
-    #     if detach_gazebo and detach_movit:
-    #         scene.remove_attached_object(end_effector_link, name="cube_green")
-    #         set_allowed_collision(scene_pub, "cube_green", [
-    #             "rg2_base_link", "l_finger_link", "l_moment_arm_link", "l_truss_arm_link",
-    #             "r_finger_link", "r_moment_arm_link", "r_truss_arm_link"], False)
-    #         rospy.loginfo("✅ 物體成功釋放")
-    #     else:
-    #         rospy.logwarn("⚠️ Detach 失敗")
+        if detach_gazebo and detach_movit:
+            scene.remove_attached_object(end_effector_link, name="cube_green")
+            
+            set_allowed_collision(scene_pub, "cube_green", [
+                "rg2_base_link", "l_finger_link", "l_moment_arm_link", "l_truss_arm_link",
+                "r_finger_link", "r_moment_arm_link", "r_truss_arm_link"], False)
+            
+            rospy.loginfo("✅ 物體成功釋放")
+        else:
+            rospy.logwarn("⚠️ Detach 失敗")
     # else:
     #     rospy.logwarn("❌ 抬高手臂失敗")

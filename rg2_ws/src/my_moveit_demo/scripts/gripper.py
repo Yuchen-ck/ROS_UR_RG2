@@ -7,8 +7,8 @@ from copy import deepcopy
 
 # 目標值與容忍誤差設定
 TARGET_OPEN = 0.005
-TARGET_CLOSE = -0.05
-OPEN_TOLERANCE = 0.1
+TARGET_CLOSE = -0.005
+OPEN_TOLERANCE = 0.5
 CLOSE_TOLERANCE = 0.5
 
 # 全域變數：從 joint_states callback 更新

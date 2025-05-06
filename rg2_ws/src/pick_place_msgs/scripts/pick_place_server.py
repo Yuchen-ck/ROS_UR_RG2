@@ -118,16 +118,10 @@ def handle_place_step(req):
 if __name__ == "__main__":
     rospy.init_node("pick_place_steps_server")
 
-    # setting_default_parameters() 返回：
-    # arm, gripper, scene, scene_pub,
-    # cube_pose, cube_size,
-    # table_pose, table_size,
-    # end_effector_link, end_effector_current_pose
-    # 但我們只需要其中部分，用 _ 略過不需要的
     (
         arm, _gripper, _scene, _scene_pub,
         cube_pose, cube_size,
-        _table_pose, _table_size,
+        table_pose, table_size,
         _ee_link, end_effector_pose
     ) = setting_default_parameters()
 

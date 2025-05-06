@@ -28,13 +28,13 @@ def move_above_table(arm, pose_start, table_pose, table_size, cube_size):
     [PLACE] Step 1 : 
     """
     # 建立路徑點：先 current，再上方 pose1
-    cube_size_x, cube_size_y, cube_size_z = cube_size
-    table_size_x, table_size_y, table_size_z = table_size
+    _, _, cube_size_z = cube_size
+    _, _, table_size_z = table_size
 
     pose_above_table = deepcopy(pose_start)
-    pose_above_table.position.z = table_size_z + cube_size_z + 0.5
+    pose_above_table.position.z = 0.8
     pose_above_table.position.x = table_pose.position.x
-    pose_above_table.position.y = table_pose.position.y + 0.2
+    pose_above_table.position.y = table_pose.position.y 
 
     # 計算 Cartesian path
     plan_lift, fraction_lift = arm.compute_cartesian_path([pose_start, pose_above_table], 0.03, True)
@@ -43,7 +43,7 @@ def move_above_table(arm, pose_start, table_pose, table_size, cube_size):
 
     # 執行
     if fraction_lift > 0.5 :
-        move_to_pose(arm, plan_lift, fraction_lift)
+        move_to_pose(arm, plan_lift, fraction_lift , criterion=0.5)
         return pose_above_table
     else:
         rospy.logwarn("[PICK] move_above_object failed (%.2f%%)", fraction_lift * 100)
