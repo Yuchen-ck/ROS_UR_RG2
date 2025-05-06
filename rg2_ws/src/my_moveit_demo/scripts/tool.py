@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 import sys
+from place.place_main import place
 import rospy
 import moveit_commander
 
 from setting_parameters import *
 # from pick_place_main import *
 from pick.pick_main import pick
-# from place.place_function import place
+# from place.place_function import 
 
 
 def main():
@@ -28,8 +29,8 @@ def main():
     pose_down, attach_gazebo, attach_movit = pick(arm, scene, cube_pose, end_effector_link)
    
 
-    # if attach_gazebo and attach_movit: 
-    #     place(arm, gripper, scene, scene_pub, pose_down, table_pose, table_size, cube_size, end_effector_link)
+    if attach_gazebo and attach_movit: 
+        place(arm, gripper, scene, scene_pub, pose_down, table_pose, table_size, cube_size, end_effector_link)
 
     moveit_commander.roscpp_shutdown()
     moveit_commander.os._exit(0)

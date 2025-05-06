@@ -47,7 +47,7 @@ def pick(arm, scene, cube_pose, end_effector_link):
     
     arm.set_start_state_to_current_state()
 
-    # Step 1 - open gripper
+    # [PICK]-1 open gripper
     # open_gripper(gripper)
     if call_gripper_srv("gripper/open"):
         rospy.loginfo("RG2 Gripper 已打開")
@@ -61,7 +61,7 @@ def pick(arm, scene, cube_pose, end_effector_link):
     arm.set_start_state_to_current_state()
 
 
-    # Step 2 - 移動到物體上方
+    # [PICK]-2 移動到物體上方
     # move_above_object(arm, cube_pose, cube_size, end_effector_current_pose, gripper_tip_offset=0.2)
     success, pose_above_object = call_pick_step_srv("move_above_object")
     if not success:
@@ -77,7 +77,7 @@ def pick(arm, scene, cube_pose, end_effector_link):
     if abs(pose_above_object.position.x - cube_pose.position.x) <= 0.01 and abs(pose_above_object.position.y - cube_pose.position.y) <= 0.01:
         rospy.loginfo("[PICK] 夾爪已在物體正上方，下移中...")
         
-        # Step 3 - 夾爪往下移
+        # [PICK]-3 夾爪往下移
         # down_to_object(arm, pose_above_object, cube_pose, cube_size[2])
         success, pose_down = call_pick_step_srv("move_lower_to_object")
         if not success:
@@ -89,7 +89,7 @@ def pick(arm, scene, cube_pose, end_effector_link):
         arm.clear_pose_targets()  # ✅ 正確的方法名稱
         arm.set_start_state_to_current_state()
 
-        # Step 4 - close_gripper
+        # [PICK]-4 close_gripper
         # close_gripper(gripper)
         if call_gripper_srv("gripper/close"):
             rospy.loginfo("[PICK] 夾爪閉合成功，附著物體")
