@@ -1,0 +1,8 @@
+prefix=/home/test/rg2_ws/install
+
+Name: onrobot_rg_description
+Description: Description of onrobot_rg_description
+Version: 1.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

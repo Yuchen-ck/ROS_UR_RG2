@@ -5,13 +5,15 @@
 # This file includes the relevant testing commands required for 
 # testing this directory and lists subdirectories to be tested as well.
 subdirs("gtest")
+subdirs("onrobot_rg_description")
 subdirs("rg2_description")
+subdirs("pick_place_msgs")
 subdirs("universal_robot/universal_robots")
 subdirs("ur5_rg2_moveit_config")
-subdirs("tm_app")
 subdirs("opencv_pratice")
 subdirs("gazebo_ros_link_attacher")
 subdirs("roboticsgroup_gazebo_plugins")
+subdirs("roboticsgroup_upatras_gazebo_plugins")
 subdirs("universal_robot/ur10_moveit_config")
 subdirs("universal_robot/ur10e_moveit_config")
 subdirs("universal_robot/ur12e_moveit_config")

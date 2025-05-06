@@ -19,8 +19,6 @@ from gripper import joint_states_callback
 
 gripper_tip_offset = 0.12
 
-
-
 def setting_default_parameters():
     """
     初始化 ROS、MoveIt!、TF 订阅、场景对象、规划器和抓取/放置所需的各项
@@ -106,16 +104,16 @@ def setting_default_parameters():
     rospy.loginfo("End effector link: %s", end_effector_link)
 
     end_effector_current_pose = get_current_end_effector_pose(end_effector_link)
-    rospy.loginfo(
-        "Current EE pose: x=%.3f y=%.3f z=%.3f",
-        end_effector_current_pose.position.x,
-        end_effector_current_pose.position.y,
-        end_effector_current_pose.position.z
-    )
+    # rospy.loginfo(
+    #     "Current EE pose: x=%.3f y=%.3f z=%.3f",
+    #     end_effector_current_pose.position.x,
+    #     end_effector_current_pose.position.y,
+    #     end_effector_current_pose.position.z
+    # )
     ori = end_effector_current_pose.orientation
-    rospy.loginfo("Current EE ori: x=%.3f y=%.3f z=%.3f w=%.3f",
-        ori.x, ori.y, ori.z, ori.w
-    )
+    # rospy.loginfo("Current EE ori: x=%.3f y=%.3f z=%.3f w=%.3f",
+    #     ori.x, ori.y, ori.z, ori.w
+    # )
 
     # 10) 返回所有用得到的句柄和參數
     return (

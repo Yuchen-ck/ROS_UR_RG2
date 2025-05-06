@@ -1,75 +1,97 @@
 #!/usr/bin/env python3
 import rospy
-import sys
-import moveit_commander
-from std_srvs.srv import Trigger, TriggerResponse
-from copy import deepcopy
 
-from gripper import open_gripper, close_gripper, JointState, joint_states_callback
-from object import add_object_to_scene, set_allowed_collision, get_current_end_effector_pose ,move_to_pose
-from attach_and_detach import attach_links_gazebo, attach_links_moveit, detach_links_gazebo, detach_links_moveit
+from std_srvs.srv import Trigger
+from pick_place_msgs.srv import PickStep 
 
+from pick.pick_function import *
+from attach_and_detach import *
 
+def call_gripper_srv(service_name: str) -> bool:
+    """
+    共用的小工具：呼叫 pick/open 或 pick/close
+    回傳 True 代表成功，False 代表失敗
+    """
+    rospy.wait_for_service(service_name)
+    try:
+        srv = rospy.ServiceProxy(service_name, Trigger)
+        resp = srv()          # Trigger 無需 request 內容
+        if resp.success:
+            rospy.loginfo("%s → %s", service_name, resp.message)
+        else:
+            rospy.logerr("%s → %s", service_name, resp.message)
+        return resp.success
+    except rospy.ServiceException as e:
+        rospy.logerr("%s service call failed: %s", service_name, e)
+        return False
 
-def pick(arm, gripper, scene, scene_pub, cube_pose, cube_size, end_effector_link ,end_effector_current_pose ,gripper_tip_offset = 0.02):
-    rospy.loginfo("[PICK] 嘗試打開夾爪...")
-    if open_gripper(gripper):
+def call_pick_step_srv(step_name: str):
+    """
+    呼叫 pick_step service，例如 step_name = "move_above_object"
+    回傳成功與否、訊息與目標姿態
+    """
+    rospy.wait_for_service("/pick_step")
+    try:
+        srv = rospy.ServiceProxy("/pick_step", PickStep)
+        resp = srv(step_name)
+        if resp.success:
+            rospy.loginfo("Step '%s' 成功：%s", step_name, resp.message)
+        else:
+            rospy.logwarn("Step '%s' 失敗：%s", step_name, resp.message)
+        return resp.success, resp.pose
+    except rospy.ServiceException as e:
+        rospy.logerr("呼叫 pick_step '%s' 失敗：%s", step_name, e)
+        return False, None
+
+def pick(arm, scene, cube_pose, end_effector_link):
+    
+    arm.set_start_state_to_current_state()
+
+    # Step 1 - open gripper
+    # open_gripper(gripper)
+    if call_gripper_srv("gripper/open"):
         rospy.loginfo("RG2 Gripper 已打開")
+    else:
+        rospy.logerr("無法打開夾爪，終止 Pick 流程")
+        return None, False, False
 
     rospy.sleep(1)
     arm.stop()
     arm.clear_pose_targets()  # ✅ 正確的方法名稱
     arm.set_start_state_to_current_state()
 
-    waypoints = [deepcopy(end_effector_current_pose)]
 
-    cube_size_x, cube_size_y, cube_size_z = cube_size
-    pose1 = deepcopy(end_effector_current_pose)
-    pose1.position.z = cube_pose.position.z + cube_size_z + gripper_tip_offset
-    pose1.position.x = cube_pose.position.x 
-    pose1.position.y = cube_pose.position.y - (cube_size_y //2)
-    waypoints.append(deepcopy(pose1))
-
-    (plan, fraction) = arm.compute_cartesian_path(waypoints, 0.02, True)
-    rospy.loginfo("[PICK] Cartesian path coverage: %.2f%%", fraction * 100)
-    move_to_pose(arm, plan, fraction)
+    # Step 2 - 移動到物體上方
+    # move_above_object(arm, cube_pose, cube_size, end_effector_current_pose, gripper_tip_offset=0.2)
+    success, pose_above_object = call_pick_step_srv("move_above_object")
+    if not success:
+        rospy.logerr("移動到物體上方失敗，終止 Pick 流程")
+        return None, False, False
 
     rospy.sleep(1)
     arm.stop()
-    arm.clear_pose_targets()  # ✅ 修正錯誤
+    arm.clear_pose_targets()  # ✅ 正確的方法名稱
     arm.set_start_state_to_current_state()
 
-    if abs(pose1.position.x - cube_pose.position.x) <= 0.01 and abs(pose1.position.y - cube_pose.position.y) <= 0.01:
+
+    if abs(pose_above_object.position.x - cube_pose.position.x) <= 0.01 and abs(pose_above_object.position.y - cube_pose.position.y) <= 0.01:
         rospy.loginfo("[PICK] 夾爪已在物體正上方，下移中...")
         
+        # Step 3 - 夾爪往下移
+        # down_to_object(arm, pose_above_object, cube_pose, cube_size[2])
+        success, pose_down = call_pick_step_srv("move_lower_to_object")
+        if not success:
+            rospy.logerr("移動到物體上方失敗，終止 Pick 流程")
+            return None, False, False
         
-        pose_down = deepcopy(pose1)
-        gripper_pad_thickness = 0.01
-        pose_down.position.z = cube_pose.position.z + (cube_size_z / 2) - gripper_pad_thickness
+        rospy.sleep(1)
+        arm.stop()
+        arm.clear_pose_targets()  # ✅ 正確的方法名稱
+        arm.set_start_state_to_current_state()
 
-        waypoints = [deepcopy(pose1), deepcopy(pose_down)]
-        (plan_down, fraction_down) = arm.compute_cartesian_path(waypoints, 0.02, True)
-        move_to_pose(arm, plan_down, fraction_down, criterion=0.5)
-
-        rospy.sleep(2)
-
-        set_allowed_collision(
-            scene_pub, "cube_green",
-            ["rg2_base_link", "l_finger_link", "l_moment_arm_link", "l_truss_arm_link",
-             "r_finger_link", "r_moment_arm_link", "r_truss_arm_link"], True)
-
-
-        rospy.loginfo("Target pose: x=%.3f, y=%.3f, z=%.3f",
-                        cube_pose.position.x, cube_pose.position.y, cube_pose.position.z)
-        rospy.loginfo("After moveing pose: x=%.3f, y=%.3f, z=%.3f",
-                        pose1.position.x, pose1.position.y, pose1.position.z)
-
-
-
-        rospy.loginfo("[PICK] 嘗試閉合夾爪...")
-        close_success = close_gripper(gripper)
-
-        if close_success:
+        # Step 4 - close_gripper
+        # close_gripper(gripper)
+        if call_gripper_srv("gripper/close"):
             rospy.loginfo("[PICK] 夾爪閉合成功，附著物體")
             attach_gazebo = attach_links_gazebo("cube_green")
             attach_movit = attach_links_moveit(scene, end_effector_link, "cube_green")

@@ -40,8 +40,8 @@ if __name__ == "__main__":
     end_effector_link, end_effector_current_pose = setting_default_parameters()
 
     # 注册两个服务： pick/open 和 pick/close
-    rospy.Service("pick/open",  Trigger, handle_open_trigger)
-    rospy.Service("pick/close", Trigger, handle_close_trigger)
+    rospy.Service("gripper/open",  Trigger, handle_open_trigger)
+    rospy.Service("gripper/close", Trigger, handle_close_trigger)
 
     rospy.loginfo("gripper_service ready: advertise pick/open and pick/close")
     rospy.spin()

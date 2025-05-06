@@ -124,24 +124,6 @@ def set_allowed_collision(scene_pub, object_name, link_names, allowed):
     scene_pub.publish(ps_diff)
     rospy.loginfo("已更新 ACM：物件 '%s' 與連結 %s 的 collision 設定為 %s", object_name, link_names, allowed)
 
-def move_to_pose(arm, plan, fraction , criterion = 0.8):
-    if fraction >= criterion:
-        # 手動補上時間資訊
-        duration_per_point = 0.05
-        for i, point in enumerate(plan.joint_trajectory.points):
-            point.time_from_start = rospy.Duration((i + 1) * duration_per_point)
-
-        rospy.loginfo("Total points in trajectory: %d", len(plan.joint_trajectory.points))
-        for i, point in enumerate(plan.joint_trajectory.points):
-            rospy.loginfo("Point %d:", i)
-            rospy.loginfo("  Time from start: %.4f s", point.time_from_start.to_sec())
-            rospy.loginfo("  Positions: %s", [round(p, 4) for p in point.positions])
-
-        rospy.loginfo("Executing Cartesian path...")
-        arm.execute(plan, wait=True)
-    else:
-        rospy.logwarn("Cartesian path planning failed. Fraction too low.")
-
 
 
 # if __name__ == '__main__':

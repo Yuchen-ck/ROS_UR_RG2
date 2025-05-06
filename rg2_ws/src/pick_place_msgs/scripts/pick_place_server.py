@@ -94,12 +94,14 @@ def handle_place_step(req):
     elif step == "move_lower_to_object":
         if move_above_pose is None:
             return PickStepResponse(False, "no above-pose to lower from", Pose())
+        
         pose_down = down_to_object(
             arm,
             move_above_pose,
             cube_pose,
             cube_size[2]
         )
+        
         if pose_down:
             move_above_pose = deepcopy(pose_down)
             return PickStepResponse(True, "lowered OK", pose_down)

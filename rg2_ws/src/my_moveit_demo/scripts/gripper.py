@@ -6,7 +6,7 @@ from sensor_msgs.msg import JointState
 from copy import deepcopy
 
 # 目標值與容忍誤差設定
-TARGET_OPEN = 1.0
+TARGET_OPEN = 0.005
 TARGET_CLOSE = -0.05
 OPEN_TOLERANCE = 0.1
 CLOSE_TOLERANCE = 0.5
@@ -46,7 +46,7 @@ def check_success(target: float, tol: float, timeout: float = 5.0) -> bool:
 
 def open_gripper(gripper) -> bool:
     """打開夾爪，並確認到位後回 True，失敗回 False"""
-    gripper.set_joint_value_target({"gripper_joint": TARGET_OPEN})
+    gripper.set_joint_value_target({"gripper_joint": 0.5})
     success = gripper.go(wait=True)
     gripper.stop()
     if not success:

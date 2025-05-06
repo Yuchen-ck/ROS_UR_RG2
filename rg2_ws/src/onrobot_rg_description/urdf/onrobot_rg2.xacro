@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <!--
+    onrobot_rg2.xacro
+    只定義 gripper base link 的 macro，不宣告 world 或額外固定 joint。
+    在最終 model xacro (e.g. onrobot_rg2_model.xacro) 裡，把它 include 進來，
+    然後用一個 fixed joint 掛到 UR5 的 tool0。
+  -->
+
+  <xacro:macro name="onrobot_rg2_base_link" params="prefix">
+    <link name="${prefix}onrobot_rg2_base_link">
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.7"/>
+        <inertia
+          ixx="1.0E-03" ixy="1.0E-06" ixz="1.0E-06"
+          iyy="1.0E-03" iyz="1.0E-06" izz="1.0E-03"/>
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://onrobot_rg_description/meshes/rg2/visual/base_link.stl"/>
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://onrobot_rg_description/meshes/rg2/collision/base_link.stl"/>
+        </geometry>
+      </collision>
+    </link>
+    <gazebo reference="${prefix}onrobot_rg2_base_link">
+      <mu1>1.0</mu1>
+      <mu2>1.0</mu2>
+      <selfCollide>false</selfCollide>
+      <material>Gazebo/White</material>
+    </gazebo>
+  </xacro:macro>
+
+  <!--
+    下面兩個 macro 只是把 finger_links / finger_joints 包起來，
+    不需修改，留在這裡給後續的 model_macro.xacro 呼叫。
+  -->
+  <xacro:macro name="finger_joints" params="prefix fingerprefix reflect">
+    <xacro:inner_knuckle_joint prefix="${prefix}" fingerprefix="${fingerprefix}" reflect="${reflect}"/>
+    <xacro:inner_finger_joint   prefix="${prefix}" fingerprefix="${fingerprefix}"/>
+  </xacro:macro>
+
+  <xacro:macro name="finger_links" params="prefix fingerprefix">
+    <xacro:outer_knuckle prefix="${prefix}" fingerprefix="${fingerprefix}"/>
+    <xacro:inner_knuckle prefix="${prefix}" fingerprefix="${fingerprefix}"/>
+    <xacro:inner_finger  prefix="${prefix}" fingerprefix="${fingerprefix}"/>
+  </xacro:macro>
+
+</robot>
